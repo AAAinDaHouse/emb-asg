@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 //creating a student structure to hold student data
 struct student
@@ -32,9 +33,34 @@ void InsertAtEnd();
 struct node*head=NULL,*tail=NULL;                        /*creating the head and tail pointers and initializing them to NULL*/
 int Number_of_nodes=0;
 
+
+void compare_InsertAtFirst(int N);
+void compare_InsertAtMiddle(int N);
+void compare_InsertAtEnd(int N);
+
+
 int main()
 {
-    printf("Welcome to the student system...\n\n\n");
+printf("Welcome to the student system...\n\n\n");
+//calculating the size taken by the structure and one node in memory.
+printf("the size taken by the structure in memory: %d \n",sizeof(struct student));
+printf("the size taken by the node in memory: %d \n\n",sizeof(struct node));
+
+//comparison for a small value of N:
+printf("for a small value of N: \n");
+compare_InsertAtFirst(5000);
+compare_InsertAtMiddle(5000);
+compare_InsertAtEnd(5000);
+//comparison for a medium value of N:
+printf("for a middle value of N: \n");
+compare_InsertAtFirst(50000);
+compare_InsertAtMiddle(50000);
+compare_InsertAtEnd(50000);
+//comparison for a large value of N:
+printf("for a large value of N: \n");
+compare_InsertAtFirst(1000000);
+compare_InsertAtMiddle(1000000);
+compare_InsertAtEnd(1000000);
 
     return 0;
 }
@@ -89,9 +115,9 @@ void add_at_last()                                      //this function is used 
 
 void add_at_middle(int index)                           //this function is used to add an element in the beginning of array
 {
-  while(index<1||index>num_of_elements)                 //this loop is to make sure user is entering suitable index to add element in it
+  while(index<1||index>=num_of_elements)                 //this loop is to make sure user is entering suitable index to add element in it
   {
-    printf("wrong integer for insertion, try an integer between 1 and %d",num_of_elements);
+    printf("wrong integer for insertion, try an integer between 1 and %d",num_of_elements-1);
     scanf("%d",&index);
   }
   num_of_elements++;
@@ -101,7 +127,7 @@ void add_at_middle(int index)                           //this function is used 
     array[i]=array_of_students[i];
   }
 
-  for (int i=index;i<num_of_elements;i++)               //this loop transfer all data after index from old array to new one
+  for (int i=index+1;i<num_of_elements;i++)               //this loop transfer all data after index from old array to new one
   {
     array[i]=array_of_students[i-1];
   }
@@ -174,3 +200,91 @@ void InsertAtEnd()
     tail->next=NULL;
     Number_of_nodes++;
 }
+/*A function that compares the insertion at the beginning of a linked list and a dynamic array of N elements
+------------------------------------------------------------------------------------------------------------*/
+void compare_InsertAtFirst(int N)
+{
+    Linked_list(N);
+    array_of_students=create_array(N);
+
+    double t;
+    //the next part captures two clocks before and after using the function. Calculating the difference between them gives the execution time.
+    t=clock();
+    InsertAtFirst();
+    t=clock()-t;
+    printf("The time taken to insert at first in linked list: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+
+    t=clock();
+    add_at_first();
+    t=clock()-t;
+    printf("The time taken to insert at first in array: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+    //freeing the created dynamic array and linked list.
+    free(array_of_students);
+    struct node* temp;
+    while(head!=NULL)
+    {
+        temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+/*A function that compares the insertion at the middle of a linked list and a dynamic array of N elements
+------------------------------------------------------------------------------------------------------------*/
+void compare_InsertAtMiddle(int N)
+{
+
+    Linked_list(N);
+    array_of_students=create_array(N);
+
+    double t;
+
+    t=clock();
+    InsertAtMiddle(N/2);
+    t=clock()-t;
+    printf("The time taken to insert at middle in linked list: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+
+    t=clock();
+    add_at_middle(N/2);
+    t=clock()-t;
+    printf("The time taken to insert at middle in array: %lf ms \n", (double)(t/CLOCKS_PER_SEC)*1000);
+
+    free(array_of_students);
+    struct node* temp;
+    while(head!=NULL)
+    {
+        temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+/*A function that compares the insertion at the end of a linked list and a dynamic array of N elements
+------------------------------------------------------------------------------------------------------------*/
+void compare_InsertAtEnd(int N)
+{
+    Linked_list(N);
+    array_of_students=create_array(N);
+
+    double t;
+
+    t=clock();
+    InsertAtEnd();
+    t=clock()-t;
+    printf("The time taken to insert at end in linked list: %lf ms \n", (double)(t/CLOCKS_PER_SEC)*1000);
+
+    t=clock();
+    add_at_last();
+    t=clock()-t;
+    printf("The time taken to insert at end in array: %lf ms \n\n\n", (double)(t/CLOCKS_PER_SEC)*1000);
+
+    free(array_of_students);
+    struct node* temp;
+    while(head!=NULL)
+    {
+        temp=head;
+        head=head->next;
+        free(temp);
+    }
+}
+
+
+
