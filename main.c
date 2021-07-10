@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include<string.h>
 
 //creating a student structure to hold student data
 struct student
@@ -16,56 +17,167 @@ struct student data;
 struct node* next;
 };
 
-
-int num_of_elements=0;                                   //creates integer responsible for saving the size of dynamic array
-struct student* array_of_students;                       //creates a pointer to the dynamic array
-struct student* create_array(int num);
-void add_at_first();
-void add_at_last();
-void add_at_middle(int index);
+struct student* create_array(int* N);
+void Insert_In_Array(int* N ,struct student**Array,int index,struct student DATA);
 
 void get_data(struct student *std);
+void display_data(struct student *std);
 
-void Linked_list(int N);
-void InsertAtFirst();
-void InsertAtMiddle(int index);
-void InsertAtEnd();
-struct node*head=NULL,*tail=NULL;                        /*creating the head and tail pointers and initializing them to NULL*/
-int Number_of_nodes=0;
+void Linked_list(int* N,struct node**head,struct node**tail);
+void Insert_In_List(int*N,struct node**head,struct node**tail,int index,struct student DATA);
 
+void COMPARE(int N); //function used to compare time taken by linked list & dynamic array
 
-void compare_InsertAtFirst(int N);
-void compare_InsertAtMiddle(int N);
-void compare_InsertAtEnd(int N);
+void ignore()
+{
+char dumb[1];
+gets(dumb);
+}
 
 
 int main()
 {
-printf("Welcome to the student system...\n\n\n");
-//calculating the size taken by the structure and one node in memory.
-printf("the size taken by the structure in memory: %d \n",sizeof(struct student));
-printf("the size taken by the node in memory: %d \n\n",sizeof(struct node));
+printf("\n\n   ...Welcome to the student system...\n\n\n");
+struct node* head=NULL;
+struct node* tail=NULL;
+int n_list=0;
+int n_array=0;
+struct student* array=NULL;
+struct student data;
+int choice=-1;
 
-//comparison for a small value of N:
-printf("for a small value of N: \n");
-compare_InsertAtFirst(5000);
-compare_InsertAtMiddle(5000);
-compare_InsertAtEnd(5000);
-//comparison for a medium value of N:
-printf("for a middle value of N: \n");
-compare_InsertAtFirst(50000);
-compare_InsertAtMiddle(50000);
-compare_InsertAtEnd(50000);
-//comparison for a large value of N:
-printf("for a large value of N: \n");
-compare_InsertAtFirst(1000000);
-compare_InsertAtMiddle(1000000);
-compare_InsertAtEnd(1000000);
 
-    return 0;
+while(1)
+{
+    printf("\nUtilize an array or linked list,compare time complexity,and exit:(array=0,linked list=1,complexity comparison=2,exit=3)\n");
+    scanf("%d",&choice);
+    switch (choice)
+{
+    case 0:
+    {
+    if (n_array==0)
+    {
+    printf("please, enter number of students.\n");
+    scanf("%d",&n_array);
+    ignore();
+    array=create_array(&n_array);
+    for(int j=0;j<n_array;j++)
+      {
+        get_data(array+j);
+      }
+    }
+
+    else
+    {
+    printf("do you want to display a student or insert new student: (insert=0, display=1)");
+    scanf("%d",&choice);
+    ignore();
+    if (choice==0)
+    {
+        printf("please, enter the data of the student.\n");
+        get_data(&data);
+        printf("please, enter the index of the student.\n");
+        int i;
+        scanf("%d",&i);
+        Insert_In_Array(&n_array ,&array ,i,data);
+    }
+    else if(choice==1)
+    {
+        printf("please, enter the index of the student.\n");
+        int i;
+        scanf("%d",&i);
+        if(i>=n_array){printf("no info!\n");}
+        else {display_data(&array[i]);}
+    }
+    else {printf("WRONG CHOICE!\n");}
+    }
+
+    choice=0;
+break;
+
 }
 
-void get_data(struct student *std)                       //this function takes the student's data from user
+case 1:
+    {
+
+      if (n_list==0)
+    {
+    printf("please, enter number of students.\n");
+    scanf("%d",&n_list);
+    ignore();
+    Linked_list(&n_list,&head,&tail);
+    struct node* temp=head;
+    for(int j=0;j<n_list;j++)
+      {
+        get_data(&(temp->data));
+        temp=temp->next;
+      }
+    }
+    else
+    {
+    printf("do you want to display a student or insert new student: (insert=0, display=1)");
+    scanf("%d",&choice);
+    ignore();
+    if (choice==0)
+    {
+        printf("please, enter the data of the student.\n");
+        get_data(&data);
+        printf("please, enter the index of the student.\n");
+        int i;
+        scanf("%d",&i);
+        Insert_In_List(&n_list,&head,&tail,i,data);
+    }
+    else if(choice==1)
+    {
+        printf("please, enter the index of the student.\n");
+        int i;
+        scanf("%d",&i);
+        if(i>=n_list){printf("no info!\n");}
+        else{
+        struct node* temp=head;
+        for(int j=0;j<i;j++)
+        {
+            temp=temp->next;
+        }
+        display_data(&(temp->data));
+        }
+    }
+    else {printf("WRONG CHOICE!\n");}
+    }
+    choice=1;
+
+    break;
+    }
+
+
+case 2:
+    {
+        printf("\n Comparison of time complexity of array and linked list: \n");
+        printf("For small number of elements:\n");
+        COMPARE(100);
+        printf("\nFor medium number of elements:\n");
+        COMPARE(100000);
+        printf("\nFor large number of elements:\n");
+        COMPARE(1000000);
+        break;
+    }
+
+case 3:
+    {
+        return 0;
+    }
+default:
+    {
+        printf("WRONG CHOICE!\n");
+    }
+}
+
+}
+
+return 0;
+}
+
+void get_data(struct student *std)                  //this function takes the student's data from user
 {
     printf ("Enter student name: ");
     gets(std->std_name);
@@ -77,179 +189,195 @@ void get_data(struct student *std)                       //this function takes t
     scanf("%d",&(std->std_year));
     printf("Enter student last score: ");
     scanf("%d",&(std->std_lastscore));
+    ignore();
+}
+
+void display_data(struct student *std)
+{
+    printf ("student name: ");
+    printf("%s\n",std->std_name);
+    printf("student ID: ");
+    printf("%d\n",std->std_id);
+    printf("student date of birth: ");
+    printf("%d/",std->std_day);
+    printf("%d/",std->std_month);
+    printf("%d/\n",std->std_year);
+    printf("student last score: ");
+    printf("%d\n",std->std_lastscore);
+
 }
 
 
-struct student* create_array(int num)                   //this function creates a dynamic array for user taking its size as an argument
+struct student* create_array(int* N)                   //this function creates a dynamic array for user taking its size as an argument
 {
- struct student *array=(struct student*) malloc(num*sizeof(struct student));
- num_of_elements=num;
- return array;                                          //the function returns a pointer to array of structures to be saved
+ struct student *array=(struct student*) malloc((*N)*sizeof(struct student));
+ return array;                                       //the function returns a pointer to array of structures to be saved
 }
 
-void add_at_first()                                     //this function is used to add an element in the beginning of array
+
+void Insert_In_Array(int* N, struct student**Array,int index,struct student DATA)        //this function is used to add an element in the beginning of array
 {
-  num_of_elements++;
-  struct student *array=(struct student*) malloc((num_of_elements)*sizeof(struct student));
-  for (int i=0;i<num_of_elements-1;i++)                 //this loop is to transfer data from old array to the new one
+  while(index<0||index>*N)                 //this loop is to make sure user is entering suitable index to add element in it
   {
-    array[i+1]=array_of_students[i];
-  }
-
-  free(array_of_students);                              //the old version of data is freed
-  array_of_students=array;                              //the new modified version of data is saved in the dynamic array
-}
-
-void add_at_last()                                      //this function is used to add an element in the beginning of array
-{
-  num_of_elements++;
-  struct student *array=(struct student*) malloc((num_of_elements)*sizeof(struct student));
-  for (int i=0;i<num_of_elements-1;i++)
-  {
-    array[i]=array_of_students[i];
-  }
-
-  free(array_of_students);
-  array_of_students=array;
-}
-
-void add_at_middle(int index)                           //this function is used to add an element in the beginning of array
-{
-  while(index<1||index>=num_of_elements)                 //this loop is to make sure user is entering suitable index to add element in it
-  {
-    printf("wrong integer for insertion, try an integer between 1 and %d",num_of_elements-1);
+    printf("wrong integer for insertion, try an integer between 0 and %d",*N);
     scanf("%d",&index);
   }
-  num_of_elements++;
-  struct student *array=(struct student*) malloc((num_of_elements)*sizeof(struct student));
+  (*N)++;
+  struct student *array=(struct student*) malloc((*N)*sizeof(struct student));
+  strcpy(array[index].std_name,DATA.std_name);
+  array[index].std_id=DATA.std_id;
+  array[index].std_day=DATA.std_day;
+  array[index].std_lastscore=DATA.std_lastscore;
+  array[index].std_month=DATA.std_month;
+  array[index].std_year=DATA.std_year;
+  //insertion at the beginning:
+  if(index==0)
+  {
+  for (int i=1;i<(*N);i++)                 //this loop is to transfer data from old array to the new one
+  {
+    array[i]=(*Array)[i-1];
+  }
+
+  free(*Array);                              //the old version of data is freed
+  *Array=array;
+  }
+  //insertion at the end:
+  else if(index==*N)
+  {
+  for (int i=0;i<(*N)-1;i++)
+  {
+    array[i]=(*Array)[i];
+  }
+
+  free(*Array);
+  *Array=array;
+  }
+  //insertion at the middle:
+  else
+  {
   for (int i=0;i<index;i++)                             //this loop transfer all data before index from old array to new one
   {
-    array[i]=array_of_students[i];
+    array[i]=(*Array)[i];
   }
 
-  for (int i=index+1;i<num_of_elements;i++)               //this loop transfer all data after index from old array to new one
+  for (int i=index+1;i<*N;i++)               //this loop transfer all data after index from old array to new one
   {
-    array[i]=array_of_students[i-1];
+    array[i]=(*Array)[i-1];
   }
 
-  free(array_of_students);
-  array_of_students=array;
+  free(*Array);
+  *Array=array;
+  }
 }
 
 /*defining a function that creates a linked list of N elements
 ---------------------------------------------------------------*/
-void Linked_list(int N)
+
+void Linked_list(int*N,struct node**head,struct node**tail)
 {   struct node *New; /*A pointer that holds the address of each new node we create in the heap*/
-    struct node **p;  /*A pointer that points at the next pointer in each new node we create*/
-    head=(struct node*)malloc(sizeof(struct node)); /*creating the first node and pointing to it with head*/
-    p=&(head->next); /*pointing to the next pointer of the first node with the pointer p*/
-    for(int k=1;k<N;k++)
+    *head=(struct node*)malloc(sizeof(struct node)); /*creating the first node and pointing to it with head*/
+    struct node *current=*head;
+    for(int k=1;k<*N;k++)
     {
         New=(struct node*)malloc(sizeof(struct node));
-        *p=New;
-        p=&((*p)->next);
+        current->next=New;
+        current=current->next;
     }
     /*pointing with the tail pointer to the last created node and assigning its next to NULL*/
-    tail=New;
-    tail->next=NULL;
-    Number_of_nodes=N;
+    *tail=New;
+    (*tail)->next=NULL;
 }
 
-/*defining a function that inserts a new node at the beginning of our list.
---------------------------------------------------------------------------*/
-void InsertAtFirst()
-{
-    struct node* New=(struct node*)malloc(sizeof(struct node));
-    New->next=head;
-    head=New;
-    Number_of_nodes++;
-}
 
-/*defining a function that inserts a new node at middle of our list.
-this function takes the variable index that determines where the new node is to be inserted.
-index should takes a value from 1,2,...,Number_of_nodes-1.
--------------------------------------------------------------------------------------------*/
-void InsertAtMiddle(int index)
+void Insert_In_List(int*N,struct node**head,struct node**tail,int index,struct student DATA)
 {  /*ensuring that index is in the available range*/
-   label:if(index>=Number_of_nodes || index<=0)
-           {printf("wrong index for insertion.Try an integer between 1 and ");
-            printf("%d",Number_of_nodes-1);
-            printf("\n");
+    while(index>*N || index<0)
+         {
+            printf("wrong index for insertion.Try an integer between 0 and %d \n",*N);
             scanf("%d",&index);
-            goto label;
-           }
-     else  {
-         struct node* New=(struct node*)malloc(sizeof(struct node));
-         struct node **p;
-         p=&(head->next);   /*pointing with p at the next pointer of the first node*/
-         for(int i=1;i<=index-1;i++) /*A loop that updates p until it points at the next pointer of the node preceding our new node */
-             p=&((*p)->next);
-         New->next=*p;
-         *p=New;
-         Number_of_nodes++;
-           }
-}
-
-/*defining a function that inserts a new node at the end of our list.
---------------------------------------------------------------------*/
-void InsertAtEnd()
-{
+         }
     struct node* New=(struct node*)malloc(sizeof(struct node));
-    tail->next=New;
-    tail=New;
-    tail->next=NULL;
-    Number_of_nodes++;
-}
-/*A function that compares the insertion at the beginning of a linked list and a dynamic array of N elements
-------------------------------------------------------------------------------------------------------------*/
-void compare_InsertAtFirst(int N)
-{
-    Linked_list(N);
-    array_of_students=create_array(N);
+    New->data.std_day=DATA.std_day;
+    New->data.std_id=DATA.std_id;
+    New->data.std_lastscore=DATA.std_lastscore;
+    New->data.std_month=DATA.std_month;
+    New->data.std_year=DATA.std_year;
+    strcpy(New->data.std_name,DATA.std_name);
+    //insertion at beginning:
+    if(index==0)
+      {
+            New->next=*head;
+            *head=New;
+            (*N)++;
+      }
+    //insertion at end:
+    else if(index==*N)
+      {
+           (*tail)->next=New;
+            *tail=New;
+           (*tail)->next=NULL;
+           (*N)++;
 
-    double t;
-    //the next part captures two clocks before and after using the function. Calculating the difference between them gives the execution time.
+      }
+    //insertion at middle:
+    else
+      {
+         struct node *temp;
+         temp=*head;
+         for(int i=1;i<index;i++) /*A loop that updates p until it points at the next pointer of the node preceding our new node */
+             temp=temp->next;
+         New->next=temp->next;
+         temp->next=New;
+         (*N)++;
+      }
+
+}
+
+/*a function that compares the time complexity of insertion in a linked list and an array at different positions*/
+void COMPARE(int N)
+{
+   int N_array=N;
+   int N_list=N;
+   struct student* array=NULL;
+   struct node* head=NULL;
+   struct node* tail=NULL;
+   struct student data;
+   double t;
+    array=create_array(&N_array);
+    Linked_list(&N_list,&head,&tail);
+    printf("N=%d:\n",N);
+    printf("size of the linked list: %lu bytes\n",N_list*sizeof(struct node));
+    //insertion in list
     t=clock();
-    InsertAtFirst();
+    Insert_In_List(&N_list,&head,&tail,0,data);
     t=clock()-t;
     printf("The time taken to insert at first in linked list: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
-
     t=clock();
-    add_at_first();
-    t=clock()-t;
-    printf("The time taken to insert at first in array: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
-    //freeing the created dynamic array and linked list.
-    free(array_of_students);
-    struct node* temp;
-    while(head!=NULL)
-    {
-        temp=head;
-        head=head->next;
-        free(temp);
-    }
-}
-/*A function that compares the insertion at the middle of a linked list and a dynamic array of N elements
-------------------------------------------------------------------------------------------------------------*/
-void compare_InsertAtMiddle(int N)
-{
-
-    Linked_list(N);
-    array_of_students=create_array(N);
-
-    double t;
-
-    t=clock();
-    InsertAtMiddle(N/2);
+    Insert_In_List(&N_list,&head,&tail,N_list/2,data);
     t=clock()-t;
     printf("The time taken to insert at middle in linked list: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
-
     t=clock();
-    add_at_middle(N/2);
+    Insert_In_List(&N_list,&head,&tail,N_list,data);
     t=clock()-t;
-    printf("The time taken to insert at middle in array: %lf ms \n", (double)(t/CLOCKS_PER_SEC)*1000);
+    printf("The time taken to insert at end in linked list: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
 
-    free(array_of_students);
-    struct node* temp;
+    printf("size of the array: %lu bytes\n",N_array*sizeof(struct student));
+    //insertion in array
+    t=clock();
+    Insert_In_Array(&N_array,&array,0,data);
+    t=clock()-t;
+    printf("The time taken to insert at first in array: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+    t=clock();
+    Insert_In_Array(&N_array,&array,N_array/2,data);
+    t=clock()-t;
+    printf("The time taken to insert at middle in array: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+    t=clock();
+    Insert_In_Array(&N_array,&array,N_array,data);
+    t=clock()-t;
+    printf("The time taken to insert at end in array: %lf ms \n",(double)(t/CLOCKS_PER_SEC)*1000);
+
+    free(array);
+    struct node*temp;
     while(head!=NULL)
     {
         temp=head;
@@ -257,34 +385,4 @@ void compare_InsertAtMiddle(int N)
         free(temp);
     }
 }
-/*A function that compares the insertion at the end of a linked list and a dynamic array of N elements
-------------------------------------------------------------------------------------------------------------*/
-void compare_InsertAtEnd(int N)
-{
-    Linked_list(N);
-    array_of_students=create_array(N);
-
-    double t;
-
-    t=clock();
-    InsertAtEnd();
-    t=clock()-t;
-    printf("The time taken to insert at end in linked list: %lf ms \n", (double)(t/CLOCKS_PER_SEC)*1000);
-
-    t=clock();
-    add_at_last();
-    t=clock()-t;
-    printf("The time taken to insert at end in array: %lf ms \n\n\n", (double)(t/CLOCKS_PER_SEC)*1000);
-
-    free(array_of_students);
-    struct node* temp;
-    while(head!=NULL)
-    {
-        temp=head;
-        head=head->next;
-        free(temp);
-    }
-}
-
-
 
